@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="google" value="notranslate">
+  <title>Blockly Demo:</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="/storage.js"></script>
+  <script src="../../blockly_compressed.js"></script>
+  <script src="../../blocks_compressed.js"></script>
+  <script src="../../javascript_compressed.js"></script>
+  <script src="../../python_compressed.js"></script>
+  <script src="../../php_compressed.js"></script>
+  <script src="../../lua_compressed.js"></script>
+  <script src="../../dart_compressed.js"></script>
+  
+  
+ 
+ <script src="FileSaver.min.js"></script>
+ <!--  <script src="field_image.js"></script> -->
+  
+  <script src="../../generators/javascript.js"></script>
+  <script src="../../generators/javascript/logic.js"></script>
+  <script src="../../generators/javascript/loops.js"></script>
+  <script src="../../generators/javascript/text.js"></script>
+  <script src="../../generators/javascript/lists.js"></script>
+  <script src="../../generators/javascript/colour.js"></script>
+  <script src="../../generators/javascript/math.js"></script>
+  <script src="../../generators/javascript/procedures.js"></script>
+  <script src="../../generators/javascript/variables.js"></script>
+  <script src="../../generators/javascript/variables_dynamic.js"></script>
+  
+  
+  <script src="../../generators/javascript/pllab/generator_operation.js"></script>
+  <script src="../../blocks/pllab/block_operation.js"></script>
+  
+  <script src="../../generators/javascript/pllab/import.js"></script>
+  
+  <script src="../../generators/python/pllab/import.js"></script>
+  <script src="../../blocks/pllab/import.js"></script>
+  
+  <script src="../../generators/python/pllab/load_module.js"></script>
+  <script src="../../blocks/pllab/load_module.js"></script>
+  
+
+  
+  <script src="../../generators/javascript/pllab/export_new.js"></script>
+  <script src="../../blocks/pllab/export_new.js"></script>
+  
+  <script src="../../generators/javascript/pllab/import_new.js"></script>
+  <script src="../../blocks/pllab/import_new.js"></script>
+  
+  
+  <script src="analytics.js"></script>
+  <script src="app_controller.js"></script>
+  <script src="block_definition_extractor.js"></script>
+  <script src="block_exporter_controller.js"></script>
+  <script src="block_exporter_tools.js"></script>
+  <script src="block_exporter_view.js"></script>
+  <script src="block_library_controller.js"></script>
+  <script src="block_library_storage.js"></script>
+  <script src="block_library_view.js"></script>
+  <script src="block_option.js"></script>
+  <script src="blocks.js"></script>
+  <script src="factory.js"></script>
+  <script src="factory_utils.js"></script>
+  <script src="standard_categories.js"></script>
+  
+  
+
+ 
+  
+  <script src="code.js"></script>
+</head>
+<body>
+  <table width="100%" height="100%">
+    <tr>
+      <td>
+        <h1>Blockly Library System</a>
+          <span id="title"></span>
+        </h1>
+      </td>
+      <td class="farSide">
+        <select id="languageMenu"></select>
+      </td>
+    </tr>
+	
+	<tr>
+	  <td>
+		<div class="dropdown">
+        <button onclick="save_block()" id="button_export">Save Block</button>
+        <button onclick="export_block()" id="button_export">Export Block</button>
+        <input type="file" text="Import Library" id="input_import_library" onchange="load_library()"; this.value=null; return false; accept=".js, .txt, .xml, .blk" class="inputfile"></input>
+        <label for="input_import_library"> Import Library</label>
+		<button onclick="save_code()" id="button_code_export">Save Code</button>
+        <input type="file" text="Import Custom Blocks" id="input_import_block" onchange="load_block()"; this.value=null; return false; accept=".js, .txt, .xml, .blk" class="inputfile"></input>
+        <label for="input_import_block"> Import Block</label>
+        <button onclick="runit()" id="runPy" text="runPython">Run Python</button>
+        <button onclick="update_toolbox()" id="update_toolbox" text="update_toolbox"> Reset Toolbox</button>
+        
+        </div>
+	  </td>
+	  <td>
+	  <!--
+	    <label><input type="checkbox" id="blockDefCheck">Block Definition(s)</label><br>
+        <div id="blockDefSettings" class="subsettings">
+          <label>Format:
+          <select id="exportFormat">
+            <option value="JSON">JSON</option>
+            <option value="JavaScript">JavaScript</option>
+          </select></label>
+          <br>
+          <label>File Name:<br>
+          <input type="text" id="blockDef_filename"></label>
+        </div>
+		<br>
+		<button id="exporterSubmitButton" title="Download block starter code as specified in export settings.">Export</button>
+	  -->
+	  </td>
+	</tr>
+	
+	
+    <tr>
+      <td colspan=2>
+        <table width="100%">
+          <tr id="tabRow" height="1em">
+            <td id="tab_blocks" class="tabon">...</td>
+            <td class="tabmin">&nbsp;</td>
+            <td id="tab_javascript" class="taboff">JavaScript</td>
+            <td class="tabmin">&nbsp;</td>
+            <td id="tab_python" class="taboff">Python</td>
+            <td class="tabmin">&nbsp;</td>
+            <td id="tab_php" class="taboff">PHP</td>
+            <td class="tabmin">&nbsp;</td>
+            <td id="tab_lua" class="taboff">Lua</td>
+            <td class="tabmin">&nbsp;</td>
+            <td id="tab_dart" class="taboff">Dart</td>
+            <td class="tabmin">&nbsp;</td>
+            <td id="tab_xml" class="taboff">XML</td>
+            <td class="tabmin">&nbsp;</td>
+            <td id="tab_test" class="taboff">Output</td>
+            <td class="tabmax">
+              <button id="trashButton" class="notext" title="...">
+                <img src='../../media/1x1.gif' class="trash icon21">
+              </button>
+              <button id="linkButton" class="notext" title="...">
+                <img src='../../media/1x1.gif' class="link icon21">
+              </button>
+              <button id="runButton" class="notext primary" title="...">
+                <img src='../../media/1x1.gif' class="run icon21">
+              </button>
+              <button id="runPyButton" onclick="runit()" class="notext primary" title="...">
+                <img src='../../media/1x1.gif' class="run icon21">
+              </button>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td height="99%" colspan=2 id="content_area">
+      </td>
+    </tr>
+  </table>
+  <div id="content_blocks" class="content"></div>
+  <pre id="content_javascript" class="content"></pre>
+  <pre id="content_python" class="content"></pre>
+  <pre id="content_php" class="content"></pre>
+  <pre id="content_lua" class="content"></pre>
+  <pre id="content_dart" class="content"></pre>
+  <textarea id="content_xml" class="content" wrap="off"></textarea>
+  <textarea id="content_test" class="content" wrap="off"></textarea>
+
+	
+  <xml id="toolbox" style="display: none">
+    <category name="%{BKY_CATLOGIC}" colour="%{BKY_LOGIC_HUE}">
+      <block type="controls_if"></block>
+      <block type="logic_compare"></block>
+      <block type="logic_operation"></block>
+      <block type="logic_negate"></block>
+      <block type="logic_boolean"></block>
+      <block type="logic_null"></block>
+      <block type="logic_ternary"></block>
+    </category>
+    <category name="%{BKY_CATLOOPS}" colour="%{BKY_LOOPS_HUE}">
+      <block type="controls_repeat_ext">
+        <value name="TIMES">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="controls_whileUntil"></block>
+      <block type="controls_for">
+        <value name="FROM">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="TO">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+        <value name="BY">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="controls_forEach"></block>
+      <block type="controls_flow_statements"></block>
+    </category>
+    <category name="%{BKY_CATMATH}" colour="%{BKY_MATH_HUE}">
+      <block type="math_number">
+        <field name="NUM">123</field>
+      </block>
+      <block type="math_arithmetic">
+        <value name="A">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="B">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_single">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">9</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_trig">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">45</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_constant"></block>
+      <block type="math_number_property">
+        <value name="NUMBER_TO_CHECK">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_round">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">3.1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_on_list"></block>
+      <block type="math_modulo">
+        <value name="DIVIDEND">
+          <shadow type="math_number">
+            <field name="NUM">64</field>
+          </shadow>
+        </value>
+        <value name="DIVISOR">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_constrain">
+        <value name="VALUE">
+          <shadow type="math_number">
+            <field name="NUM">50</field>
+          </shadow>
+        </value>
+        <value name="LOW">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="HIGH">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_random_int">
+        <value name="FROM">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="TO">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_random_float"></block>
+      <block type="math_atan2">
+        <value name="X">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="Y">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <category name="%{BKY_CATTEXT}" colour="%{BKY_TEXTS_HUE}">
+      <block type="text"></block>
+      <block type="text_join"></block>
+      <block type="text_append">
+        <value name="TEXT">
+          <shadow type="text"></shadow>
+        </value>
+      </block>
+      <block type="text_length">
+        <value name="VALUE">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_isEmpty">
+        <value name="VALUE">
+          <shadow type="text">
+            <field name="TEXT"></field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_indexOf">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">{textVariable}</field>
+          </block>
+        </value>
+        <value name="FIND">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_charAt">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">{textVariable}</field>
+          </block>
+        </value>
+      </block>
+      <block type="text_getSubstring">
+        <value name="STRING">
+          <block type="variables_get">
+            <field name="VAR">{textVariable}</field>
+          </block>
+        </value>
+      </block>
+      <block type="text_changeCase">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_trim">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_print">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_prompt_ext">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <category name="%{BKY_CATLISTS}" colour="%{BKY_LISTS_HUE}">
+      <block type="lists_create_with">
+        <mutation items="0"></mutation>
+      </block>
+      <block type="lists_create_with"></block>
+      <block type="lists_repeat">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">5</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="lists_length"></block>
+      <block type="lists_isEmpty"></block>
+      <block type="lists_indexOf">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">{listVariable}</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_getIndex">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">{listVariable}</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_setIndex">
+        <value name="LIST">
+          <block type="variables_get">
+            <field name="VAR">{listVariable}</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_getSublist">
+        <value name="LIST">
+          <block type="variables_get">
+            <field name="VAR">{listVariable}</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_split">
+        <value name="DELIM">
+          <shadow type="text">
+            <field name="TEXT">,</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="lists_sort"></block>
+    </category>
+    <category name="%{BKY_CATCOLOUR}" colour="%{BKY_COLOUR_HUE}">
+      <block type="colour_picker"></block>
+      <block type="colour_random"></block>
+      <block type="colour_rgb">
+        <value name="RED">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+        <value name="GREEN">
+          <shadow type="math_number">
+            <field name="NUM">50</field>
+          </shadow>
+        </value>
+        <value name="BLUE">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="colour_blend">
+        <value name="COLOUR1">
+          <shadow type="colour_picker">
+            <field name="COLOUR">#ff0000</field>
+          </shadow>
+        </value>
+        <value name="COLOUR2">
+          <shadow type="colour_picker">
+            <field name="COLOUR">#3333ff</field>
+          </shadow>
+        </value>
+        <value name="RATIO">
+          <shadow type="math_number">
+            <field name="NUM">0.5</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <sep></sep>
+    <category name="%{BKY_CATVARIABLES}" colour="%{BKY_VARIABLES_HUE}" custom="VARIABLE"></category>
+    <category name="%{BKY_CATFUNCTIONS}" colour="%{BKY_PROCEDURES_HUE}" custom="PROCEDURE"></category>
+	
+	<sep></sep>
+	<category name="Library" colour="%{BKY_COLOUR_HUE}">
+	
+		<block type="import"></block>
+		<block type="load_module"></block>
+		
+		<block type="import_new"></block>
+		
+		
+		<block type="export"></block>
+		
+		<block type="my_operation"></block>
+				
+		<variables>
+		<variable type="" id="(/miMRqTY]j!X3nYrU;$">test</variable>
+	  </variables>
+	  <block type="variables_set" id="=t-a!jTprM4)53hO+@Pg" x="288" y="88">
+		<field name="VAR" id="(/miMRqTY]j!X3nYrU;$" variabletype="">test</field>
+		<value name="VALUE">
+		  <block type="math_number" id="$CvcOj!6|@joqeb}ngkN">
+			<field name="NUM">123</field>
+		  </block>
+		</value>
+		<next>
+		  <block type="my_operation" id="!aEz_?sI[q^b{26u(NJ/">
+			<field name="my_operation">+</field>
+			<value name="NAME">
+			  <block type="variables_get" id="E.g]Q5MCQOd(|4xz3Sb|">
+				<field name="VAR" id="(/miMRqTY]j!X3nYrU;$" variabletype="">test</field>
+			  </block>
+			</value>
+			<value name="number">
+			  <block type="math_number" id="w}teM_#ThA_=DpCw|L(9">
+				<field name="NUM">123</field>
+			  </block>
+			</value>
+			<next>
+			  <block type="controls_if" id="%477UOJ25Y9n54!yyX{3">
+				<mutation else="1"></mutation>
+				<value name="IF0">
+				  <block type="logic_compare" id="=}l}ImW|NhcCDo-=Oa4)">
+					<field name="OP">EQ</field>
+					<value name="A">
+					  <block type="variables_get" id="`vOmEzi=?K-3VXqZR,DC">
+						<field name="VAR" id="(/miMRqTY]j!X3nYrU;$" variabletype="">test</field>
+					  </block>
+					</value>
+					<value name="B">
+					  <block type="math_number" id="1)k}~T(?j[3x6[Gr=?A/">
+						<field name="NUM">246</field>
+					  </block>
+					</value>
+				  </block>
+				</value>
+				<statement name="DO0">
+				  <block type="text_print" id="OmJv404e!ZA=g4-c|{Ph">
+					<value name="TEXT">
+					  <shadow type="text" id="Ai^sql7aebE_$tv*JO?p">
+						<field name="TEXT">abc</field>
+					  </shadow>
+					</value>
+				  </block>
+				</statement>
+				<statement name="ELSE">
+				  <block type="text_print" id="2yrwWR_5nRqiKGq=;2lq">
+					<value name="TEXT">
+					  <shadow type="text" id="nx=g^%2l4h2p0BI886tF">
+						<field name="TEXT">no</field>
+					  </shadow>
+					</value>
+				  </block>
+				</statement>
+			  </block>
+			</next>
+		  </block>
+		</next>
+	  </block>
+	  
+	  <variables>
+    <variable type="" id="cCj.I.xd(MwW`s~{Vu;e">num</variable>
+  </variables>
+  <block type="procedures_defreturn" collapsed="true" id="jHQa9z.!#^_RH,ymnI36" x="188" y="38">
+    <mutation>
+      <arg name="num" varid="cCj.I.xd(MwW`s~{Vu;e"></arg>
+    </mutation>
+    <field name="NAME">fibo</field>
+    <comment pinned="false" h="80" w="160">Describe this function...</comment>
+    <statement name="STACK">
+      <block type="procedures_ifreturn" id="d=r%DO+aTzF4Z2j?m~mW">
+        <mutation value="1"></mutation>
+        <value name="CONDITION">
+          <block type="logic_compare" id="Q2,Bd4eE2DklRTdzif;g">
+            <field name="OP">EQ</field>
+            <value name="A">
+              <block type="variables_get" id="K--2PUcaq%hW!SpyzysH">
+                <field name="VAR" id="cCj.I.xd(MwW`s~{Vu;e" variabletype="">num</field>
+              </block>
+            </value>
+            <value name="B">
+              <block type="math_number" id="w5vTk]V%pFVOwtePl4~Y">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <value name="VALUE">
+          <block type="math_number" id="1sfH?BXRMAo=^u)F`y(=">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <next>
+          <block type="procedures_ifreturn" id="Jx-_*ho5xUv{oXO7VXim">
+            <mutation value="1"></mutation>
+            <value name="CONDITION">
+              <block type="logic_compare" id="u13{Bh)#Ss;77ocI!bmM">
+                <field name="OP">EQ</field>
+                <value name="A">
+                  <block type="variables_get" id="u=7;C;_Wc=VJ[wx8S_*J">
+                    <field name="VAR" id="cCj.I.xd(MwW`s~{Vu;e" variabletype="">num</field>
+                  </block>
+                </value>
+                <value name="B">
+                  <block type="math_number" id="#U7c7,0n|2LxsWd^Pv~_">
+                    <field name="NUM">1</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <value name="VALUE">
+              <block type="math_number" id="j7k5ReGz-6G5:N;AdPKy">
+                <field name="NUM">1</field>
+              </block>
+            </value>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="RETURN">
+      <block type="math_arithmetic" id="@7O(zJ*{U}?UC(b#.*L|">
+        <field name="OP">ADD</field>
+        <value name="A">
+          <shadow type="math_number" id="|rr2_bYYFgRiuFzh[n!V">
+            <field name="NUM">1</field>
+          </shadow>
+          <block type="procedures_callreturn" id="pQo+xhz-nvmgtGS`o6A4">
+            <mutation name="fibo">
+              <arg name="num"></arg>
+            </mutation>
+            <value name="ARG0">
+              <block type="math_arithmetic" id="[5g0!3hEq@m^,coS7*Xo">
+                <field name="OP">MINUS</field>
+                <value name="A">
+                  <shadow type="math_number" id="1uOTz/m/:ggv3s70$c-y">
+                    <field name="NUM">1</field>
+                  </shadow>
+                  <block type="variables_get" id="Q1%fh3YAw89VzpjF~F(S">
+                    <field name="VAR" id="cCj.I.xd(MwW`s~{Vu;e" variabletype="">num</field>
+                  </block>
+                </value>
+                <value name="B">
+                  <shadow type="math_number" id="#9aF:d:^tX{%aPxXaQO0">
+                    <field name="NUM">1</field>
+                  </shadow>
+                </value>
+              </block>
+            </value>
+          </block>
+        </value>
+        <value name="B">
+          <shadow type="math_number" id="Aq#zkm;[0^l9-OZ5-Y3p">
+            <field name="NUM">1</field>
+          </shadow>
+          <block type="procedures_callreturn" id="g-yAl#cp)qJC}ctjO,H{">
+            <mutation name="fibo">
+              <arg name="num"></arg>
+            </mutation>
+            <value name="ARG0">
+              <block type="math_arithmetic" id="a)~qVTLmV2H}NxPqy@b2">
+                <field name="OP">MINUS</field>
+                <value name="A">
+                  <shadow type="math_number" id="1uOTz/m/:ggv3s70$c-y">
+                    <field name="NUM">1</field>
+                  </shadow>
+                  <block type="variables_get" id="hm%%]@kIlKTjx6=8tpc[">
+                    <field name="VAR" id="cCj.I.xd(MwW`s~{Vu;e" variabletype="">num</field>
+                  </block>
+                </value>
+                <value name="B">
+                  <shadow type="math_number" id="6f4RjU0PshFu)12+|u/B">
+                    <field name="NUM">2</field>
+                  </shadow>
+                </value>
+              </block>
+            </value>
+          </block>
+        </value>
+      </block>
+    </value>
+  </block>
+  
+  <block type="procedures_defreturn" readOnly="true" id="jHQa9z.!#^_RH,ymnI36" x="188" y="38">
+    <mutation>
+      <arg name="num" varid="cCj.I.xd(MwW`s~{Vu;e"></arg>
+    </mutation>
+    <field name="NAME">fibo</field>
+    <comment pinned="false" h="80" w="160">Describe this function...</comment>
+    <statement name="STACK">
+      <block type="procedures_ifreturn" id="d=r%DO+aTzF4Z2j?m~mW">
+        <mutation value="1"></mutation>
+        <value name="CONDITION">
+          <block type="logic_compare" id="Q2,Bd4eE2DklRTdzif;g">
+            <field name="OP">EQ</field>
+            <value name="A">
+              <block type="variables_get" id="K--2PUcaq%hW!SpyzysH">
+                <field name="VAR" id="cCj.I.xd(MwW`s~{Vu;e" variabletype="">num</field>
+              </block>
+            </value>
+            <value name="B">
+              <block type="math_number" id="w5vTk]V%pFVOwtePl4~Y">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <value name="VALUE">
+          <block type="math_number" id="1sfH?BXRMAo=^u)F`y(=">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <next>
+          <block type="procedures_ifreturn" id="Jx-_*ho5xUv{oXO7VXim">
+            <mutation value="1"></mutation>
+            <value name="CONDITION">
+              <block type="logic_compare" id="u13{Bh)#Ss;77ocI!bmM">
+                <field name="OP">EQ</field>
+                <value name="A">
+                  <block type="variables_get" id="u=7;C;_Wc=VJ[wx8S_*J">
+                    <field name="VAR" id="cCj.I.xd(MwW`s~{Vu;e" variabletype="">num</field>
+                  </block>
+                </value>
+                <value name="B">
+                  <block type="math_number" id="#U7c7,0n|2LxsWd^Pv~_">
+                    <field name="NUM">1</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <value name="VALUE">
+              <block type="math_number" id="j7k5ReGz-6G5:N;AdPKy">
+                <field name="NUM">1</field>
+              </block>
+            </value>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="RETURN">
+      <block type="math_arithmetic" id="@7O(zJ*{U}?UC(b#.*L|">
+        <field name="OP">ADD</field>
+        <value name="A">
+          <shadow type="math_number" id="|rr2_bYYFgRiuFzh[n!V">
+            <field name="NUM">1</field>
+          </shadow>
+          <block type="procedures_callreturn" id="pQo+xhz-nvmgtGS`o6A4">
+            <mutation name="fibo">
+              <arg name="num"></arg>
+            </mutation>
+            <value name="ARG0">
+              <block type="math_arithmetic" id="[5g0!3hEq@m^,coS7*Xo">
+                <field name="OP">MINUS</field>
+                <value name="A">
+                  <shadow type="math_number" id="1uOTz/m/:ggv3s70$c-y">
+                    <field name="NUM">1</field>
+                  </shadow>
+                  <block type="variables_get" id="Q1%fh3YAw89VzpjF~F(S">
+                    <field name="VAR" id="cCj.I.xd(MwW`s~{Vu;e" variabletype="">num</field>
+                  </block>
+                </value>
+                <value name="B">
+                  <shadow type="math_number" id="#9aF:d:^tX{%aPxXaQO0">
+                    <field name="NUM">1</field>
+                  </shadow>
+                </value>
+              </block>
+            </value>
+          </block>
+        </value>
+        <value name="B">
+          <shadow type="math_number" id="Aq#zkm;[0^l9-OZ5-Y3p">
+            <field name="NUM">1</field>
+          </shadow>
+          <block type="procedures_callreturn" id="g-yAl#cp)qJC}ctjO,H{">
+            <mutation name="fibo">
+              <arg name="num"></arg>
+            </mutation>
+            <value name="ARG0">
+              <block type="math_arithmetic" id="a)~qVTLmV2H}NxPqy@b2">
+                <field name="OP">MINUS</field>
+                <value name="A">
+                  <shadow type="math_number" id="1uOTz/m/:ggv3s70$c-y">
+                    <field name="NUM">1</field>
+                  </shadow>
+                  <block type="variables_get" id="hm%%]@kIlKTjx6=8tpc[">
+                    <field name="VAR" id="cCj.I.xd(MwW`s~{Vu;e" variabletype="">num</field>
+                  </block>
+                </value>
+                <value name="B">
+                  <shadow type="math_number" id="6f4RjU0PshFu)12+|u/B">
+                    <field name="NUM">2</field>
+                  </shadow>
+                </value>
+              </block>
+            </value>
+          </block>
+        </value>
+      </block>
+    </value>
+  </block>
+	</category>
+	
+  </xml>
+
+  <script>
+  
+    if (typeof Blob !== "function")
+	var Blob = (function (view) {
+		"use strict";
+
+		var BlobBuilder = view.BlobBuilder || view.WebKitBlobBuilder || view.MozBlobBuilder || view.MSBlobBuilder || (function(view) {
+			var
+				  get_class = function(object) {
+					return Object.prototype.toString.call(object).match(/^\[object\s(.*)\]$/)[1];
+				}
+				, FakeBlobBuilder = function BlobBuilder() {
+					this.data = [];
+				}
+				, FakeBlob = function Blob(data, type, encoding) {
+					this.data = data;
+					this.size = data.length;
+					this.type = type;
+					this.encoding = encoding;
+				}
+				, FBB_proto = FakeBlobBuilder.prototype
+				, FB_proto = FakeBlob.prototype
+				, FileReaderSync = view.FileReaderSync
+				, FileException = function(type) {
+					this.code = this[this.name = type];
+				}
+				, file_ex_codes = (
+					  "NOT_FOUND_ERR SECURITY_ERR ABORT_ERR NOT_READABLE_ERR ENCODING_ERR "
+					+ "NO_MODIFICATION_ALLOWED_ERR INVALID_STATE_ERR SYNTAX_ERR"
+				).split(" ")
+				, file_ex_code = file_ex_codes.length
+				, real_URL = view.URL || view.webkitURL || view
+				, real_create_object_URL = real_URL.createObjectURL
+				, real_revoke_object_URL = real_URL.revokeObjectURL
+				, URL = real_URL
+				, btoa = view.btoa
+				, atob = view.atob
+				, can_apply_typed_arrays = false
+				, can_apply_typed_arrays_test = function(pass) {
+					can_apply_typed_arrays = !pass;
+				}
+				
+				, ArrayBuffer = view.ArrayBuffer
+				, Uint8Array = view.Uint8Array
+			;
+			FakeBlob.fake = FB_proto.fake = true;
+			while (file_ex_code--) {
+				FileException.prototype[file_ex_codes[file_ex_code]] = file_ex_code + 1;
+			}
+			try {
+				if (Uint8Array) {
+					can_apply_typed_arrays_test.apply(0, new Uint8Array(1));
+				}
+			} catch (ex) {}
+			if (!real_URL.createObjectURL) {
+				URL = view.URL = {};
+			}
+			URL.createObjectURL = function(blob) {
+				var
+					  type = blob.type
+					, data_URI_header
+				;
+				if (type === null) {
+					type = "application/octet-stream";
+				}
+				if (blob instanceof FakeBlob) {
+					data_URI_header = "data:" + type;
+					if (blob.encoding === "base64") {
+						return data_URI_header + ";base64," + blob.data;
+					} else if (blob.encoding === "URI") {
+						return data_URI_header + "," + decodeURIComponent(blob.data);
+					} if (btoa) {
+						return data_URI_header + ";base64," + btoa(blob.data);
+					} else {
+						return data_URI_header + "," + encodeURIComponent(blob.data);
+					}
+				} else if (real_create_object_URL) {
+					return real_create_object_URL.call(real_URL, blob);
+				}
+			};
+			URL.revokeObjectURL = function(object_URL) {
+				if (object_URL.substring(0, 5) !== "data:" && real_revoke_object_URL) {
+					real_revoke_object_URL.call(real_URL, object_URL);
+				}
+			};
+			FBB_proto.append = function(data/*, endings*/) {
+				var bb = this.data;
+				// decode data to a binary string
+				if (Uint8Array && data instanceof ArrayBuffer) {
+					if (can_apply_typed_arrays) {
+						bb.push(String.fromCharCode.apply(String, new Uint8Array(data)));
+					} else {
+						var
+							  str = ""
+							, buf = new Uint8Array(data)
+							, i = 0
+							, buf_len = buf.length
+						;
+						for (; i < buf_len; i++) {
+							str += String.fromCharCode(buf[i]);
+						}
+					}
+				} else if (get_class(data) === "Blob" || get_class(data) === "File") {
+					if (FileReaderSync) {
+						var fr = new FileReaderSync;
+						bb.push(fr.readAsBinaryString(data));
+					} else {
+						// async FileReader won't work as BlobBuilder is sync
+						throw new FileException("NOT_READABLE_ERR");
+					}
+				} else if (data instanceof FakeBlob) {
+					if (data.encoding === "base64" && atob) {
+						bb.push(atob(data.data));
+					} else if (data.encoding === "URI") {
+						bb.push(decodeURIComponent(data.data));
+					} else if (data.encoding === "raw") {
+						bb.push(data.data);
+					}
+				} else {
+					if (typeof data !== "string") {
+						data += ""; // convert unsupported types to strings
+					}
+					// decode UTF-16 to binary string
+					bb.push(unescape(encodeURIComponent(data)));
+				}
+			};
+			FBB_proto.getBlob = function(type) {
+				if (!arguments.length) {
+					type = null;
+				}
+				return new FakeBlob(this.data.join(""), type, "raw");
+			};
+			FBB_proto.toString = function() {
+				return "[object BlobBuilder]";
+			};
+			FB_proto.slice = function(start, end, type) {
+				var args = arguments.length;
+				if (args < 3) {
+					type = null;
+				}
+				return new FakeBlob(
+					  this.data.slice(start, args > 1 ? end : this.data.length)
+					, type
+					, this.encoding
+				);
+			};
+			FB_proto.toString = function() {
+				return "[object Blob]";
+			};
+			return FakeBlobBuilder;
+		}(view));
+
+		return function Blob(blobParts, options) {
+			var type = options ? (options.type || "") : "";
+			var builder = new BlobBuilder();
+			if (blobParts) {
+				for (var i = 0, len = blobParts.length; i < len; i++) {
+					builder.append(blobParts[i]);
+				}
+			}
+			return builder.getBlob(type);
+		};
+	}(self));
+
+  
+    function save_block() {
+    	  var xml = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace, true); // ture 시 블록아이디 제거, 디폴트: false
+    	  var data = Blockly.Xml.domToPrettyText(xml);
+    	  
+    	  console.log(data);
+    	  
+    		  
+//    	  data = data + code;
+    	  
+    	  var fileName = window.prompt('What would you like to name your file?', 'myBlock');
+    	  // Store data in blob.
+    	  // var builder = new BlobBuilder();
+    	  // builder.append(data);
+    	  // saveAs(builder.getBlob('text/plain;charset=utf-8'), 'myBlock.xml');
+    	  if(fileName){
+    		//var blob = new Blob([data], {type: 'text/xml'});
+    		var blob = new Blob([data], {type: 'text/plain;charset=utf-8'});
+    		saveAs(blob, fileName + ".xml");
+    	  } 
+    	  
+    }
+    
+    
+    function export_block() {
+	  var xml = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace, true); // ture 시 블록아이디 제거, 디폴트: false
+	  
+//	  console.log(xml.getElementsByTagName("block").length + xml.getElementsByTagName("shadow").length);
+//	  console.log(xml);	  
+	  var block_count = Blockly.mainWorkspace.getAllBlocks().length;
+	  
+	  console.log(block_count);
+	  
+	  
+//	  console.log(xml)
+//	  console.log(xml.getElementsByTagName("block")[0].getAttribute("type"));
+
+
+	  var blk = Blockly.Xml.utils.createElement('xml');
+	  
+//	  parser=new DOMParser();
+//	  var blk = parser.parseFromString("","text/xml");
+	  
+//	  var data = Blockly.Xml.domToPrettyText(xml.getElementsByTagName("block")[0]);
+	  
+	  	  
+	 
+	  var m=0;
+	  
+	  //for(var i=0; i<Blockly.mainWorkspace.getAllBlocks().length-1; i++){
+	  for(var i=0; i<xml.getElementsByTagName("block").length; i++){
+		  if (xml.getElementsByTagName("block")[i].getAttribute("type") == "export"){
+			  
+		
+			  
+	//		  console.log(xml.getElementsByTagName("block")[i].getAttribute("type"))
+			  
+	
+//			  blk.append(xml.getElementsByTagName("block")[i]);
+			  blk.append(xml.getElementsByTagName("block")[i].cloneNode(true));
+			  
+		  }
+	  }
+	  
+	  console.log(xml);
+	  console.log("=======================================\n");
+	  console.log(blk);
+
+	  console.log("=======================================\n");
+	  
+	  var data = Blockly.Xml.domToPrettyText(blk);
+	  
+	  console.log(data);
+	  
+	  /////////////// test section (for Import block)
+	  
+	  var test_dom = Blockly.Xml.textToDom(data);
+	  
+	  console.log(test_dom);
+	  
+	  var sum=0;
+	  
+//	  console.log(test_dom.getElementsByTagName("field")[0].getAttribute("name"));
+//	  console.log(test_dom.getElementsByTagName("field")[0].childNodes[0].nodeValue);
+	
+	  
+	  // import 블럭에서 받은 block name 정보(여기선 "block")를 토대로 같은거 찾는 알고리즘
+	  for(var i=0; i<test_dom.getElementsByTagName("field").length; i++){
+		  
+		  if(test_dom.getElementsByTagName("field")[i].childNodes[0].nodeValue == "block"){
+			  sum = sum+1;
+		  }
+		  
+		  console.log(sum);
+		  
+	  }
+	  
+	  var my_code = Blockly.blockToCode
+	  
+	  
+	  ////////////////////////////////////////////
+//
+	  
+	  var fileName = window.prompt('What would you like to name your file?', 'myBlock');
+	  // Store data in blob.
+	  // var builder = new BlobBuilder();
+	  // builder.append(data);
+	  // saveAs(builder.getBlob('text/plain;charset=utf-8'), 'myBlock.xml');
+	  if(fileName){
+		//var blob = new Blob([data], {type: 'text/xml'});
+		var blob = new Blob([data], {type: 'text/plain;charset=utf-8'});
+		saveAs(blob, fileName + ".blk");
+	  } 
+	  
+	}
+    
+    
+    
+    
+    
+    
+	
+	function save_code() {
+	  var fileName = window.prompt('What would you like to name your file?', 'myCode')
+	  //doesn't save if the user quits the save prompt
+	  if(fileName){
+		var blob = new Blob([Blockly.JavaScript.workspaceToCode(Blockly.mainWorkspace)], {type: 'text/plain;charset=utf-8'});
+		saveAs(blob, fileName + '.js');
+	  }
+	}
+	
+	
+	function update_toolbox(){
+		
+		var dom = document.getElementById("toolbox");
+		
+		console.log(dom);
+		
+
+		var box = document.getElementById("import_library");
+		
+		console.log(box);
+		
+		
+//		box.appendChild(box);
+		
+//		console.log(box);
+		
+		// toolbox 추가 기능
+		var categoryElement = document.createElement('category');
+		categoryElement.setAttribute('name', 'file_name');
+		dom.appendChild(categoryElement);
+		
+		
+		Blockly.mainWorkspace.updateToolbox(dom);	
+		/////////////////////
+	}
+	
+	
+	function load_block() {
+		
+		console.log("load start");
+		
+		var reader=new FileReader();
+        var files=document.getElementById("input_import_block").files;
+        
+        var file=files[0];
+        
+        console.log(files[0]);
+        console.log(file);
+        
+        
+        if(file)
+        {
+        	reader.onload=function(e)
+        	{         	
+                var blk=reader.result;
+                var dom=Blockly.Xml.textToDom(blk);
+                Blockly.Xml.appendDomToWorkspace(dom,Blockly.mainWorkspace);
+                fileName=file.name;
+                
+                console.log(blk);
+                console.log(dom);
+               
+                alert(fileName);
+               
+                //////////// toolbox 추가 작업
+                
+                var my_toolbox = document.getElementById("toolbox");
+                var categoryElement = document.createElement('category');
+        		categoryElement.setAttribute('name', fileName);
+        		
+        		
+        		console.log(my_toolbox);
+        		
+        		
+        		
+//        		var categoryElement2 = document.createElement('block');
+//        		categoryElement2.setAttribute('type', "variables_set");
+        		
+        		
+//        		categoryElement.appendChild(categoryElement2);
+        		
+        		
+//        		blk.append(xml.getElementsByTagName("block")[i].cloneNode(true));
+//        		var dom_fix = dom.cloneNode(true);
+        		
+ 	
+        		
+        		
+
+        		oldText = Blockly.Xml.domToText(dom);
+        		
+        		newText = oldText.replace(/<(\/xml|xml)([^>]*)>/gi,"");
+        		
+/*        		
+        		parser = new DOMParser();
+        		xmlDoc = parser.parseFromString(newText,"text/xml");
+       		
+
+        	
+        		
+        		
+//        		categoryElement.appendChild(xmlDoc.getElementsByTagName('block')[0]);
+				categoryElement.appendChild(xmlDoc.childNodes[0]);
+ */
+ 
+ 				
+////				categoryElement.appendChild(dom);
+        		
+ 
+// 				for(i=0; i<dom.childNodes.length-1; i++){
+// 					categoryElement.getElementsByTagsName("cateogry")[0].appendChild(dom.childNodes[i]);
+// 					console.log(dom.childNodes[i]);
+// 					console.log(categoryElement);
+// 				}
+ 
+        		
+        		console.log(dom.childNodes);
+        		console.log(dom.childNodes.length);
+        		
+  //      		for(i=0; i<dom.childNodes.length; i++){
+ //       			categoryElement.appendChild(dom.childNodes[i]);
+//        		}
+        		
+  	
+   /*      		if(dom.childNodes[0].nodeName == "#text"){
+        			console.log('here');
+        		}
+        		
+        		else{
+        			console.log('no');
+        		} */
+        		
+        		for(i=0; i<dom.childNodes.length; i++){
+        			if(dom.childNodes[i].nodeName == "#text"){
+            			console.log('here');
+            		}
+        			else{
+        				categoryElement.appendChild(dom.childNodes[i]);
+        			}
+        		}
+        		
+        	
+        		
+//        		console.log(dom.childNodes[1]);
+        		
+        		console.log(dom.firstChild);
+        		console.log(dom.firstChild.nextSibling);
+		
+//        		console.log(xmlDoc.childNodes[0]);
+        
+        		
+        		
+        		my_toolbox.appendChild(categoryElement);
+        	//	my_toolbox.appendChild(newDom);
+        		
+//        		console.log(my_toolbox.getElementsByTagName('xml')[0]);
+  //      		console.log(my_toolbox.getElementsByTagName('xml')[0].childNodes);
+    //    		console.log(my_toolbox.getElementsByTagName('xml')[0].childNodes[0]);
+      //  		console.log(my_toolbox.getElementsByTagName('xml')[0].childNodes[1]);
+        //		console.log(my_toolbox.getElementsByTagName('xml')[0].childNodes[2]);
+        	//	console.log(my_toolbox.getElementsByTagName('xml')[0].childNodes[3]);
+        		//console.log(my_toolbox.getElementsByTagName('xml')[0].childNodes[4]);
+        	
+        //		my_toolbox.removeChild('xml');
+        		
+        		Blockly.mainWorkspace.updateToolbox(my_toolbox);	
+                                
+          //      				my_xml = xml.replace("<xml xmlns=\"http://www.w3.org/1999/xhtml\">", "");
+            //    				my_xml = xml.replace("</xml>", "");
+                
+              //                  my_item.append(my_xml);
+                       
+                //                demoWorkspace.updateToolbox(my_item);						
+                
+                                
+                
+     //           var code=Blockly.Python.workspaceToCode(demoWorkspace);
+   //        		document.getElementById('textArea').value=code;
+        	}
+        		reader.readAsText(file);
+        }
+     
+        /*
+        console.log("texxt=-=-=-=-=-=-=-=-==-=-");
+        console.log(file);
+        console.log("dom=-=-=-=-=-=-=-=-==-=-");
+        console.log(dom);
+        
+        var my_item = document.getElementById('toolbox');
+        
+        console.log("my_item=-=-=-=-=-=-=-=-==-=-");
+        console.log(my_item);
+        
+        console.log("my_item.child=-=-=-=-=-=-=-=-==-=-");
+        console.log(my_item.createElement("br"));
+     
+//         newNode = my_item.createElement("category");
+//         console.log(newNode);
+        
+        my_item.append(dom);
+        */
+		
+	}
+	
+	
+	function load_library() {
+		
+	
+		var reader=new FileReader();
+        var files=document.getElementById("input_import_library").files;
+        
+        var file=files[0];
+        
+        console.log('start');
+        
+     
+       
+        if(file)
+        {
+        	reader.onload=function(e)
+        	{         	
+                var blk=reader.result;
+                var dom=Blockly.Xml.textToDom(blk);
+//                Blockly.Xml.appendDomToWorkspace(dom,Blockly.mainWorkspace);
+                fileName=file.name;
+                
+//                console.log(blk);
+                console.log(dom);
+                console.log(dom);
+                alert(fileName);
+               
+                //////////// toolbox 추가 작업
+                
+                var my_toolbox = document.getElementById("toolbox");
+                var categoryElement = document.createElement('category');
+        		categoryElement.setAttribute('name', fileName);
+        		categoryElement.setAttribute('colour',"%{BKY_COLOUR_HUE}");
+        		
+        		console.log(my_toolbox);
+        		
+        		console.log(dom.childNodes);
+        		
+        		console.log(dom.childNodes.length);
+        		
+        		for(i=0; i<dom.childNodes.length; i++){
+        			console.log(dom.childNodes[i]);
+        			if(dom.childNodes[i].nodeName == "#text"){
+            			console.log('here');
+            		}
+        			else{
+        				categoryElement.appendChild(dom.childNodes[i]);
+        			}
+        		}
+    
+        		console.log(dom.firstChild);
+        		console.log(dom.firstChild.nextSibling);
+		  		my_toolbox.appendChild(categoryElement);
+    
+        		
+        		Blockly.mainWorkspace.updateToolbox(my_toolbox);	
+                                
+        
+        	}
+        		reader.readAsText(file);
+        }
+        
+		
+	}
+	
+  </script>
+
+	<!-- Adding Python interpreter which is skulpt -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js" type="text/javascript"></script> 
+	<script src="http://www.skulpt.org/static/skulpt.min.js" type="text/javascript"></script> 
+	<script src="http://www.skulpt.org/static/skulpt-stdlib.js" type="text/javascript"></script> 
+	
+	<script type="text/javascript">
+	// output functions are configurable.  This one just appends some text
+	// to a pre element.
+	function outf(text) { 
+	    var mypre = document.getElementById("content_test"); 
+	    mypre.innerHTML = mypre.innerHTML + text; 
+	} 
+	function builtinRead(x) {
+	    if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+	            throw "File not found: '" + x + "'";
+	    return Sk.builtinFiles["files"][x];
+	}
+	// Here's everything you need to run a python program in skulpt
+	// grab the code from your textarea
+	// get a reference to your pre element for output
+	// configure the output function
+	// call Sk.importMainWithBody()
+	function runit() { 
+//	   var prog = document.getElementById("yourcode").value; 
+ 	   var prog = Blockly.Python.workspaceToCode(Blockly.mainWorkspace);
+	   var mypre = document.getElementById("content_test"); 
+	   mypre.innerHTML = ''; 
+	   Sk.pre = "output";
+	   Sk.configure({output:outf, read:builtinRead}); 
+	   (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
+	   var myPromise = Sk.misceval.asyncToPromise(function() {
+	       return Sk.importMainWithBody("<stdin>", false, prog, true);
+	   });
+	   myPromise.then(function(mod) {
+	       console.log('success');
+	   },
+	       function(err) {
+	       console.log(err.toString());
+	   });
+	} 
+	</script> 
+
+
+</body>
+</html>

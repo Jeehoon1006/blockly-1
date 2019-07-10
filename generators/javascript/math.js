@@ -421,3 +421,13 @@ Blockly.JavaScript['math_atan2'] = function(block) {
   return ['Math.atan2(' + argument1 + ', ' + argument0 + ') / Math.PI * 180',
       Blockly.JavaScript.ORDER_DIVISION];
 };
+
+
+Blockly.JavaScript['my_operation'] = function(block) {
+  var value_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
+  var dropdown_my_operation = block.getFieldValue('my_operation');
+  var value_number = Blockly.JavaScript.valueToCode(block, 'number', Blockly.JavaScript.ORDER_ATOMIC);
+  // TODO: Assemble JavaScript into code variable.
+  var code = '...;\n';
+  return code;
+};
